@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <title>Leap Runner</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Rotate device overlay (shown only in portrait on mobile) -->
+    <div id="rotateOverlay">
+      <div class="rotate-content">
+        <div class="phone-icon">
+          <div class="phone-body">
+            <div class="phone-screen"></div>
+            <div class="phone-home"></div>
+          </div>
+          <div class="arrow arrow-top"></div>
+          <div class="arrow arrow-bottom"></div>
+        </div>
+        <p class="rotate-text">PLEASE ROTATE YOUR PHONE</p>
+      </div>
+      <div class="logo">SK</div>
+    </div>
+
+    <canvas id="canvas1"></canvas>
+    <img id="playerImage" src="player.png" alt="Player sprite" />
+    <img id="backgroundImage" src="background_single.png" alt="Background" />
+    <img id="enemyImage" src="enemy_1.png" alt="Enemy sprite" />
+    <button id="fullscreenButton">Toggle fullscreen</button>
+    <script src="script.js"></script>
+  </body>
+</html>

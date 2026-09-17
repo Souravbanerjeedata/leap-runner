@@ -1,0 +1,184 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: black;
+  overflow: hidden;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+#canvas1 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 5px solid white;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#playerImage,
+#backgroundImage,
+#enemyImage {
+  display: none;
+}
+
+#fullscreenButton {
+  position: absolute;
+  font-size: 20px;
+  padding: 10px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  cursor: pointer;
+}
+
+/* ========== Rotate overlay (portrait mode) ========== */
+#rotateOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+#rotateOverlay.active {
+  display: flex;
+}
+
+.rotate-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+}
+
+.phone-icon {
+  position: relative;
+  width: 120px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-body {
+  width: 70px;
+  height: 130px;
+  border: 4px solid #fff;
+  border-radius: 12px;
+  background: transparent;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8px;
+  animation: rotatePhone 2.5s ease-in-out infinite;
+}
+
+.phone-screen {
+  width: 54px;
+  height: 90px;
+  background: #111;
+  border-radius: 4px;
+}
+
+.phone-home {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  margin-top: 8px;
+}
+
+.arrow {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: solid #ccc;
+  border-width: 0 4px 4px 0;
+  display: inline-block;
+}
+
+.arrow-top {
+  top: -10px;
+  right: -15px;
+  transform: rotate(-45deg);
+  animation: pulseArrow 1.5s ease-in-out infinite;
+}
+
+.arrow-bottom {
+  bottom: -10px;
+  left: -15px;
+  transform: rotate(135deg);
+  animation: pulseArrow 1.5s ease-in-out infinite 0.75s;
+}
+
+.rotate-text {
+  font-size: 18px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ccc;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.logo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #888;
+  opacity: 0.7;
+}
+
+/* Subtle phone rotation animation to match the video feel */
+@keyframes rotatePhone {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes pulseArrow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Only show overlay on portrait mobile / small screens */
+@media screen and (orientation: portrait) and (max-width: 900px) {
+  #rotateOverlay {
+    display: flex;
+  }
+
+  #canvas1,
+  #fullscreenButton {
+    display: none !important;
+  }
+}
+
+/* Hide overlay in landscape */
+@media screen and (orientation: landscape) {
+  #rotateOverlay {
+    display: none !important;
+  }
+}
