@@ -55,7 +55,14 @@ window.addEventListener("load", function () {
           this.keys.push(e.key);
         } else if (e.key === "Enter" && gameOver) {
           restartGame();
-        } else if ((e.key === "p" || e.key === "P" || e.key === " " || e.key === "Escape") && gameStarted && !gameOver) {
+        } else if (
+          (e.key === "p" ||
+            e.key === "P" ||
+            e.key === " " ||
+            e.key === "Escape") &&
+          gameStarted &&
+          !gameOver
+        ) {
           e.preventDefault();
           togglePause();
         }
@@ -73,50 +80,72 @@ window.addEventListener("load", function () {
       });
 
       // Touch controls
-      window.addEventListener("touchstart", (e) => {
-        // Ignore touches on UI buttons
-        if (e.target.tagName === "BUTTON") return;
+      window.addEventListener(
+        "touchstart",
+        (e) => {
+          // Ignore touches on UI buttons
+          if (e.target.tagName === "BUTTON") return;
 
-        const touch = e.changedTouches[0];
-        this.touchStartX = touch.pageX;
-        this.touchStartY = touch.pageY;
-        this.touchX = touch.pageX;
-        this.touchY = touch.pageY;
+          const touch = e.changedTouches[0];
+          this.touchStartX = touch.pageX;
+          this.touchStartY = touch.pageY;
+          this.touchX = touch.pageX;
+          this.touchY = touch.pageY;
 
-        // Left / Right half of screen for continuous movement
-        const screenWidth = window.innerWidth;
-        if (touch.pageX < screenWidth / 2) {
-          if (this.keys.indexOf("touch left") === -1) this.keys.push("touch left");
-        } else {
-          if (this.keys.indexOf("touch right") === -1) this.keys.push("touch right");
-        }
-      }, { passive: false });
-
-      window.addEventListener("touchmove", (e) => {
-        if (e.target.tagName === "BUTTON") return;
-        e.preventDefault(); // prevent scrolling
-
-        const touch = e.changedTouches[0];
-        const deltaX = touch.pageX - this.touchStartX;
-        const deltaY = touch.pageY - this.touchStartY;
-
-        // Vertical swipe (jump / restart)
-        if (Math.abs(deltaY) > Math.abs(deltaX)) {
-          if (deltaY < -this.touchThreshold && this.keys.indexOf("swipe up") === -1) {
-            this.keys.push("swipe up");
-          } else if (deltaY > this.touchThreshold && this.keys.indexOf("swipe down") === -1) {
-            this.keys.push("swipe down");
-            if (gameOver) restartGame();
+          // Left / Right half of screen for continuous movement
+          const screenWidth = window.innerWidth;
+          if (touch.pageX < screenWidth / 2) {
+            if (this.keys.indexOf("touch left") === -1)
+              this.keys.push("touch left");
+          } else {
+            if (this.keys.indexOf("touch right") === -1)
+              this.keys.push("touch right");
           }
-        } else {
-          // Horizontal swipe
-          if (deltaX < -this.touchThreshold && this.keys.indexOf("swipe left") === -1) {
-            this.keys.push("swipe left");
-          } else if (deltaX > this.touchThreshold && this.keys.indexOf("swipe right") === -1) {
-            this.keys.push("swipe right");
+        },
+        { passive: false },
+      );
+
+      window.addEventListener(
+        "touchmove",
+        (e) => {
+          if (e.target.tagName === "BUTTON") return;
+          e.preventDefault(); // prevent scrolling
+
+          const touch = e.changedTouches[0];
+          const deltaX = touch.pageX - this.touchStartX;
+          const deltaY = touch.pageY - this.touchStartY;
+
+          // Vertical swipe (jump / restart)
+          if (Math.abs(deltaY) > Math.abs(deltaX)) {
+            if (
+              deltaY < -this.touchThreshold &&
+              this.keys.indexOf("swipe up") === -1
+            ) {
+              this.keys.push("swipe up");
+            } else if (
+              deltaY > this.touchThreshold &&
+              this.keys.indexOf("swipe down") === -1
+            ) {
+              this.keys.push("swipe down");
+              if (gameOver) restartGame();
+            }
+          } else {
+            // Horizontal swipe
+            if (
+              deltaX < -this.touchThreshold &&
+              this.keys.indexOf("swipe left") === -1
+            ) {
+              this.keys.push("swipe left");
+            } else if (
+              deltaX > this.touchThreshold &&
+              this.keys.indexOf("swipe right") === -1
+            ) {
+              this.keys.push("swipe right");
+            }
           }
-        }
-      }, { passive: false });
+        },
+        { passive: false },
+      );
 
       window.addEventListener("touchend", (e) => {
         // Clear all touch-related keys
@@ -127,7 +156,7 @@ window.addEventListener("load", function () {
             k !== "swipe left" &&
             k !== "swipe right" &&
             k !== "touch left" &&
-            k !== "touch right"
+            k !== "touch right",
         );
       });
     }
@@ -168,7 +197,7 @@ window.addEventListener("load", function () {
         this.x,
         this.y,
         this.width,
-        this.height
+        this.height,
       );
     }
     update(input, deltaTime, enemies) {
@@ -205,7 +234,8 @@ window.addEventListener("load", function () {
       ) {
         this.speed = -5;
       } else if (
-        (input.keys.indexOf("ArrowUp") > -1 || input.keys.indexOf("swipe up") > -1) &&
+        (input.keys.indexOf("ArrowUp") > -1 ||
+          input.keys.indexOf("swipe up") > -1) &&
         this.onground()
       ) {
         this.vy -= 32;
@@ -216,7 +246,8 @@ window.addEventListener("load", function () {
       // Horizontal Movement
       this.x += this.speed;
       if (this.x < 0) this.x = 0;
-      else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+      else if (this.x > this.gameWidth - this.width)
+        this.x = this.gameWidth - this.width;
 
       // Vertical Movement
       this.y += this.vy;
@@ -259,7 +290,7 @@ window.addEventListener("load", function () {
         this.x + this.width - this.speed,
         this.y,
         this.width,
-        this.height
+        this.height,
       );
     }
     update() {
@@ -295,7 +326,7 @@ window.addEventListener("load", function () {
         this.x,
         this.y,
         this.width,
-        this.height
+        this.height,
       );
     }
     update(deltaTime) {
@@ -344,13 +375,13 @@ window.addEventListener("load", function () {
       context.fillText(
         "Game Over, Press enter or swipe down to restart!",
         canvas.width / 2,
-        200
+        200,
       );
       context.fillStyle = "white";
       context.fillText(
         "Game Over, Press enter or swipe down to restart!",
         canvas.width / 2 - 2,
-        202
+        202,
       );
     }
 
@@ -365,7 +396,11 @@ window.addEventListener("load", function () {
 
       context.font = "28px Helvetica";
       context.fillStyle = "#ccc";
-      context.fillText("Press P / Space or tap Pause to resume", canvas.width / 2, canvas.height / 2 + 40);
+      context.fillText(
+        "Press P / Space or tap Pause to resume",
+        canvas.width / 2,
+        canvas.height / 2 + 40,
+      );
     }
   }
 
@@ -376,7 +411,11 @@ window.addEventListener("load", function () {
 
     context.fillStyle = "white";
     context.font = "bold 180px Helvetica";
-    context.fillText(countdown > 0 ? countdown : "GO!", canvas.width / 2, canvas.height / 2 + 40);
+    context.fillText(
+      countdown > 0 ? countdown : "GO!",
+      canvas.width / 2,
+      canvas.height / 2 + 40,
+    );
 
     context.font = "36px Helvetica";
     context.fillStyle = "#ccc";
@@ -465,7 +504,7 @@ window.addEventListener("load", function () {
     }
 
     // Game running
-    // background.update(); // uncomment to enable scrolling background
+    background.update();
     player.update(input, deltaTime, enemies);
     handleEnemies(deltaTime);
     displayStatusText(ctx);
