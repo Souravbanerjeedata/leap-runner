@@ -1,20 +1,24 @@
 # Leap Runner
 
+<div align="center>
+   <img src="preview.png" alt="Project Banner" width="1920" height="1080" />
+</div>
+
 A fast-paced 2D side-scrolling endless runner built with pure HTML5 Canvas and vanilla JavaScript.
 
 Dodge enemies, jump over obstacles, and see how high you can score!
 
-![Game Preview](background_single.png)
-
 ## How to Play
 
 ### Desktop
+
 - **← / →** : Move left / right
 - **↑** : Jump
 - **Enter** : Restart after Game Over
 - Click **Toggle fullscreen** for immersive play
 
 ### Mobile
+
 - **Swipe up** : Jump
 - **Swipe down** : Restart after Game Over
 - **Landscape mode only** – the game will ask you to rotate your phone if you are in portrait orientation
@@ -28,17 +32,19 @@ Dodge enemies, jump over obstacles, and see how high you can score!
 - Fullscreen support
 - Portrait-mode lock with animated “Please rotate your phone” overlay
 - Responsive canvas that scales to the screen
+- 5-second countdown before the game starts
 
 ## Getting Started
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/yourusername/leap-runner.git
    cd leap-runner
    ```
 
 2. Open `index.html` in a modern browser  
-   *(or serve it with any static file server)*
+   _(or serve it with any static file server)_
 
    ```bash
    # Example with Python
@@ -63,6 +69,7 @@ leap-runner/
 ## Browser Support
 
 Works best in modern browsers that support:
+
 - HTML5 Canvas
 - ES6+
 - Fullscreen API

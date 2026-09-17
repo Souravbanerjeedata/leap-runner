@@ -8,6 +8,9 @@ window.addEventListener("load", function () {
   let enemies = [];
   let score = 0;
   let gameOver = false;
+  let gameStarted = false;
+  let countdown = 5;
+  let countdownTimer = 0;
   const fullscreenButton = document.getElementById("fullscreenButton");
   const rotateOverlay = document.getElementById("rotateOverlay");
 
@@ -289,12 +292,32 @@ window.addEventListener("load", function () {
     }
   }
 
+  function drawCountdown(context) {
+    context.textAlign = "center";
+    context.fillStyle = "rgba(0, 0, 0, 0.55)";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Big number
+    context.fillStyle = "white";
+    context.font = "bold 180px Helvetica";
+    context.fillText(countdown > 0 ? countdown : "GO!", canvas.width / 2, canvas.height / 2 + 40);
+
+    // Subtitle
+    context.font = "36px Helvetica";
+    context.fillStyle = "#ccc";
+    context.fillText("Get Ready!", canvas.width / 2, canvas.height / 2 - 100);
+  }
+
   function restartGame() {
     player.restart();
     background.restart();
     enemies = [];
     score = 0;
     gameOver = false;
+    gameStarted = false;
+    countdown = 5;
+    countdownTimer = 0;
+    lastTime = 0;
     animate(0);
   }
 
@@ -325,13 +348,37 @@ window.addEventListener("load", function () {
     const deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Always draw background + player so the scene is visible during countdown
     background.draw(ctx);
-    // background.update(); // uncomment to enable scrolling background
     player.draw(ctx);
+
+    if (!gameStarted) {
+      // Countdown phase
+      countdownTimer += deltaTime;
+      if (countdownTimer >= 1000) {
+        countdown--;
+        countdownTimer = 0;
+      }
+
+      drawCountdown(ctx);
+
+      if (countdown < 0) {
+        gameStarted = true;
+      }
+
+      requestAnimationFrame(animate);
+      return;
+    }
+
+    // Game is running
+    // background.update(); // uncomment to enable scrolling background
     player.update(input, deltaTime, enemies);
     handleEnemies(deltaTime);
     displayStatusText(ctx);
+
     if (!gameOver) requestAnimationFrame(animate);
   }
+
   animate(0);
 });
