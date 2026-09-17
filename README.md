@@ -1,8 +1,6 @@
 # Leap Runner
 
-<div align="center">
-   <img src="preview.png" alt="Project Banner" width="1920" height="1080" />
-</div>
+<div align="center"><img src="preview.png" width="1920" height="1080" /></div>
 
 A fast-paced 2D side-scrolling endless runner built with pure HTML5 Canvas and vanilla JavaScript.
 
@@ -10,29 +8,41 @@ Dodge enemies, jump over obstacles, and see how high you can score!
 
 ## How to Play
 
-### Desktop
+### Desktop (Keyboard)
 
-- **← / →** : Move left / right
-- **↑** : Jump
-- **Enter** : Restart after Game Over
-- Click **Toggle fullscreen** for immersive play
+| Action         | Key                           |
+| -------------- | ----------------------------- |
+| Move Left      | ← Left Arrow                  |
+| Move Right     | → Right Arrow                 |
+| Jump           | ↑ Up Arrow                    |
+| Pause / Resume | **P** or **Space** or **Esc** |
+| Restart        | Enter (after Game Over)       |
+| Fullscreen     | Click the Fullscreen button   |
 
-### Mobile
+### Mobile (Touch)
 
-- **Swipe up** : Jump
-- **Swipe down** : Restart after Game Over
-- **Landscape mode only** – the game will ask you to rotate your phone if you are in portrait orientation
+| Action         | Gesture / Control                     |
+| -------------- | ------------------------------------- |
+| Move Left      | Touch & hold **left half** of screen  |
+| Move Right     | Touch & hold **right half** of screen |
+| Jump           | **Swipe up**                          |
+| Pause / Resume | Tap the **Pause** button              |
+| Restart        | **Swipe down** (after Game Over)      |
+
+> **Important:** Play in **landscape** mode.  
+> The game will show a “Please rotate your phone” screen if you are in portrait.
 
 ## Features
 
+- 5-second countdown before the game starts
+- Pause / Resume (keyboard + on-screen button)
 - Smooth sprite-sheet animation for player and enemies
 - Collision detection
 - Score tracking
-- Touch controls for mobile
+- Full touch controls for mobile (left / right / jump)
 - Fullscreen support
-- Portrait-mode lock with animated “Please rotate your phone” overlay
-- Responsive canvas that scales to the screen
-- 5-second countdown before the game starts
+- Portrait-mode lock with animated rotate prompt
+- Responsive canvas
 
 ## Getting Started
 
@@ -58,7 +68,7 @@ Dodge enemies, jump over obstacles, and see how high you can score!
 ```
 leap-runner/
 ├── index.html          # Main HTML
-├── style.css           # Styles + rotate overlay
+├── style.css           # Styles + rotate overlay + UI buttons
 ├── script.js           # Game logic
 ├── player.png          # Player sprite sheet
 ├── enemy_1.png         # Enemy sprite sheet

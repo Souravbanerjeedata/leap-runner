@@ -5,13 +5,17 @@ window.addEventListener("load", function () {
   const ctx = canvas.getContext("2d");
   canvas.width = 1400;
   canvas.height = 720;
+
   let enemies = [];
   let score = 0;
   let gameOver = false;
   let gameStarted = false;
+  let isPaused = false;
   let countdown = 5;
   let countdownTimer = 0;
+
   const fullscreenButton = document.getElementById("fullscreenButton");
+  const pauseButton = document.getElementById("pauseButton");
   const rotateOverlay = document.getElementById("rotateOverlay");
 
   // Check orientation and show/hide rotate prompt
@@ -26,7 +30,6 @@ window.addEventListener("load", function () {
     }
   }
 
-  // Initial check + listeners
   checkOrientation();
   window.addEventListener("resize", checkOrientation);
   window.addEventListener("orientationchange", checkOrientation);
@@ -34,8 +37,13 @@ window.addEventListener("load", function () {
   class InputHandler {
     constructor() {
       this.keys = [];
-      this.touchY = "";
+      this.touchY = 0;
+      this.touchX = 0;
       this.touchThreshold = 30;
+      this.touchStartX = 0;
+      this.touchStartY = 0;
+
+      // Keyboard
       window.addEventListener("keydown", (e) => {
         if (
           (e.key === "ArrowDown" ||
@@ -47,8 +55,12 @@ window.addEventListener("load", function () {
           this.keys.push(e.key);
         } else if (e.key === "Enter" && gameOver) {
           restartGame();
+        } else if ((e.key === "p" || e.key === "P" || e.key === " " || e.key === "Escape") && gameStarted && !gameOver) {
+          e.preventDefault();
+          togglePause();
         }
       });
+
       window.addEventListener("keyup", (e) => {
         if (
           e.key === "ArrowDown" ||
@@ -59,27 +71,64 @@ window.addEventListener("load", function () {
           this.keys.splice(this.keys.indexOf(e.key), 1);
         }
       });
+
+      // Touch controls
       window.addEventListener("touchstart", (e) => {
-        this.touchY = e.changedTouches[0].pageY;
-      });
-      window.addEventListener("touchmove", (e) => {
-        const swipeDistance = e.changedTouches[0].pageY - this.touchY;
-        if (
-          swipeDistance < -this.touchThreshold &&
-          this.keys.indexOf("swipe up") === -1
-        ) {
-          this.keys.push("swipe up");
-        } else if (
-          swipeDistance > this.touchThreshold &&
-          this.keys.indexOf("swipe down") === -1
-        ) {
-          this.keys.push("swipe down");
-          if (gameOver) restartGame();
+        // Ignore touches on UI buttons
+        if (e.target.tagName === "BUTTON") return;
+
+        const touch = e.changedTouches[0];
+        this.touchStartX = touch.pageX;
+        this.touchStartY = touch.pageY;
+        this.touchX = touch.pageX;
+        this.touchY = touch.pageY;
+
+        // Left / Right half of screen for continuous movement
+        const screenWidth = window.innerWidth;
+        if (touch.pageX < screenWidth / 2) {
+          if (this.keys.indexOf("touch left") === -1) this.keys.push("touch left");
+        } else {
+          if (this.keys.indexOf("touch right") === -1) this.keys.push("touch right");
         }
-      });
+      }, { passive: false });
+
+      window.addEventListener("touchmove", (e) => {
+        if (e.target.tagName === "BUTTON") return;
+        e.preventDefault(); // prevent scrolling
+
+        const touch = e.changedTouches[0];
+        const deltaX = touch.pageX - this.touchStartX;
+        const deltaY = touch.pageY - this.touchStartY;
+
+        // Vertical swipe (jump / restart)
+        if (Math.abs(deltaY) > Math.abs(deltaX)) {
+          if (deltaY < -this.touchThreshold && this.keys.indexOf("swipe up") === -1) {
+            this.keys.push("swipe up");
+          } else if (deltaY > this.touchThreshold && this.keys.indexOf("swipe down") === -1) {
+            this.keys.push("swipe down");
+            if (gameOver) restartGame();
+          }
+        } else {
+          // Horizontal swipe
+          if (deltaX < -this.touchThreshold && this.keys.indexOf("swipe left") === -1) {
+            this.keys.push("swipe left");
+          } else if (deltaX > this.touchThreshold && this.keys.indexOf("swipe right") === -1) {
+            this.keys.push("swipe right");
+          }
+        }
+      }, { passive: false });
+
       window.addEventListener("touchend", (e) => {
-        this.keys.splice(this.keys.indexOf("swipe up"), 1);
-        this.keys.splice(this.keys.indexOf("swipe down"), 1);
+        // Clear all touch-related keys
+        this.keys = this.keys.filter(
+          (k) =>
+            k !== "swipe up" &&
+            k !== "swipe down" &&
+            k !== "swipe left" &&
+            k !== "swipe right" &&
+            k !== "touch left" &&
+            k !== "touch right"
+        );
       });
     }
   }
@@ -119,7 +168,7 @@ window.addEventListener("load", function () {
         this.x,
         this.y,
         this.width,
-        this.height,
+        this.height
       );
     }
     update(input, deltaTime, enemies) {
@@ -132,6 +181,7 @@ window.addEventListener("load", function () {
           gameOver = true;
         }
       });
+
       // sprite animation
       if (this.frameTimer > this.frameInterval) {
         if (this.frameX >= this.maxFrame) this.frameX = 0;
@@ -140,22 +190,34 @@ window.addEventListener("load", function () {
       } else {
         this.frameTimer += deltaTime;
       }
-      // controls
-      if (input.keys.indexOf("ArrowRight") > -1) this.speed = 5;
-      else if (input.keys.indexOf("ArrowLeft") > -1) this.speed = -5;
-      else if (
-        (input.keys.indexOf("ArrowUp") > -1 ||
-          input.keys.indexOf("swipe up") > -1) &&
+
+      // Controls (keyboard + touch)
+      if (
+        input.keys.indexOf("ArrowRight") > -1 ||
+        input.keys.indexOf("swipe right") > -1 ||
+        input.keys.indexOf("touch right") > -1
+      ) {
+        this.speed = 5;
+      } else if (
+        input.keys.indexOf("ArrowLeft") > -1 ||
+        input.keys.indexOf("swipe left") > -1 ||
+        input.keys.indexOf("touch left") > -1
+      ) {
+        this.speed = -5;
+      } else if (
+        (input.keys.indexOf("ArrowUp") > -1 || input.keys.indexOf("swipe up") > -1) &&
         this.onground()
-      )
+      ) {
         this.vy -= 32;
-      else this.speed = 0;
+      } else {
+        this.speed = 0;
+      }
 
       // Horizontal Movement
       this.x += this.speed;
       if (this.x < 0) this.x = 0;
-      else if (this.x > this.gameWidth - this.width)
-        this.x = this.gameWidth - this.width;
+      else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width;
+
       // Vertical Movement
       this.y += this.vy;
       if (!this.onground()) {
@@ -197,7 +259,7 @@ window.addEventListener("load", function () {
         this.x + this.width - this.speed,
         this.y,
         this.width,
-        this.height,
+        this.height
       );
     }
     update() {
@@ -233,7 +295,7 @@ window.addEventListener("load", function () {
         this.x,
         this.y,
         this.width,
-        this.height,
+        this.height
       );
     }
     update(deltaTime) {
@@ -275,20 +337,35 @@ window.addEventListener("load", function () {
     context.fillStyle = "white";
     context.font = "40px Helvetica";
     context.fillText("Score: " + score, 22, 52);
+
     if (gameOver) {
       context.textAlign = "center";
       context.fillStyle = "black";
       context.fillText(
         "Game Over, Press enter or swipe down to restart!",
         canvas.width / 2,
-        200,
+        200
       );
       context.fillStyle = "white";
       context.fillText(
         "Game Over, Press enter or swipe down to restart!",
         canvas.width / 2 - 2,
-        202,
+        202
       );
+    }
+
+    if (isPaused) {
+      context.fillStyle = "rgba(0, 0, 0, 0.6)";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      context.textAlign = "center";
+      context.fillStyle = "white";
+      context.font = "bold 80px Helvetica";
+      context.fillText("PAUSED", canvas.width / 2, canvas.height / 2 - 20);
+
+      context.font = "28px Helvetica";
+      context.fillStyle = "#ccc";
+      context.fillText("Press P / Space or tap Pause to resume", canvas.width / 2, canvas.height / 2 + 40);
     }
   }
 
@@ -297,15 +374,25 @@ window.addEventListener("load", function () {
     context.fillStyle = "rgba(0, 0, 0, 0.55)";
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Big number
     context.fillStyle = "white";
     context.font = "bold 180px Helvetica";
     context.fillText(countdown > 0 ? countdown : "GO!", canvas.width / 2, canvas.height / 2 + 40);
 
-    // Subtitle
     context.font = "36px Helvetica";
     context.fillStyle = "#ccc";
     context.fillText("Get Ready!", canvas.width / 2, canvas.height / 2 - 100);
+  }
+
+  function togglePause() {
+    if (!gameStarted || gameOver) return;
+    isPaused = !isPaused;
+    pauseButton.textContent = isPaused ? "Resume" : "Pause";
+
+    if (!isPaused) {
+      // Reset lastTime so deltaTime doesn't jump after pause
+      lastTime = performance.now();
+      requestAnimationFrame(animate);
+    }
   }
 
   function restartGame() {
@@ -315,9 +402,11 @@ window.addEventListener("load", function () {
     score = 0;
     gameOver = false;
     gameStarted = false;
+    isPaused = false;
     countdown = 5;
     countdownTimer = 0;
     lastTime = 0;
+    pauseButton.textContent = "Pause";
     animate(0);
   }
 
@@ -333,7 +422,9 @@ window.addEventListener("load", function () {
       document.exitFullscreen();
     }
   }
+
   fullscreenButton.addEventListener("click", toggleFullScreen);
+  pauseButton.addEventListener("click", togglePause);
 
   const input = new InputHandler();
   const player = new Player(canvas.width, canvas.height);
@@ -345,11 +436,13 @@ window.addEventListener("load", function () {
   let randomEnemyInterval = Math.random() * 1000 + 500;
 
   function animate(timeStamp) {
+    if (isPaused) return; // freeze the loop while paused
+
     const deltaTime = timeStamp - lastTime;
     lastTime = timeStamp;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Always draw background + player so the scene is visible during countdown
+    // Always draw background + player
     background.draw(ctx);
     player.draw(ctx);
 
@@ -371,7 +464,7 @@ window.addEventListener("load", function () {
       return;
     }
 
-    // Game is running
+    // Game running
     // background.update(); // uncomment to enable scrolling background
     player.update(input, deltaTime, enemies);
     handleEnemies(deltaTime);

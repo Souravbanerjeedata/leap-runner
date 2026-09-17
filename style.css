@@ -8,6 +8,7 @@ body {
   background: black;
   overflow: hidden;
   font-family: Helvetica, Arial, sans-serif;
+  touch-action: none; /* prevent browser gestures interfering */
 }
 
 #canvas1 {
@@ -26,15 +27,30 @@ body {
   display: none;
 }
 
-#fullscreenButton {
+#uiButtons {
   position: absolute;
-  font-size: 20px;
-  padding: 10px;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
   z-index: 10;
+}
+
+#uiButtons button {
+  font-size: 16px;
+  padding: 8px 16px;
   cursor: pointer;
+  border: 2px solid #fff;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 6px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#uiButtons button:active {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* ========== Rotate overlay (portrait mode) ========== */
@@ -143,7 +159,6 @@ body {
   opacity: 0.7;
 }
 
-/* Subtle phone rotation animation to match the video feel */
 @keyframes rotatePhone {
   0%,
   100% {
@@ -171,7 +186,7 @@ body {
   }
 
   #canvas1,
-  #fullscreenButton {
+  #uiButtons {
     display: none !important;
   }
 }
