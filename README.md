@@ -1,6 +1,6 @@
 # Leap Runner
 
-<div align="center>
+<div align="center">
    <img src="preview.png" alt="Project Banner" width="1920" height="1080" />
 </div>
 
