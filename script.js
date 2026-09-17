@@ -115,33 +115,37 @@ window.addEventListener("load", function () {
           const deltaX = touch.pageX - this.touchStartX;
           const deltaY = touch.pageY - this.touchStartY;
 
-          // Vertical swipe (jump / restart)
-          if (Math.abs(deltaY) > Math.abs(deltaX)) {
-            if (
-              deltaY < -this.touchThreshold &&
-              this.keys.indexOf("swipe up") === -1
-            ) {
+          // Jump / restart – prioritize clear vertical movement
+          // (allows some horizontal drift so diagonal swipes still jump)
+          if (
+            deltaY < -this.touchThreshold &&
+            Math.abs(deltaY) > Math.abs(deltaX) * 0.6
+          ) {
+            if (this.keys.indexOf("swipe up") === -1)
               this.keys.push("swipe up");
-            } else if (
-              deltaY > this.touchThreshold &&
-              this.keys.indexOf("swipe down") === -1
-            ) {
+          } else if (
+            deltaY > this.touchThreshold &&
+            Math.abs(deltaY) > Math.abs(deltaX) * 0.6
+          ) {
+            if (this.keys.indexOf("swipe down") === -1) {
               this.keys.push("swipe down");
               if (gameOver) restartGame();
             }
-          } else {
-            // Horizontal swipe
-            if (
-              deltaX < -this.touchThreshold &&
-              this.keys.indexOf("swipe left") === -1
-            ) {
+          }
+
+          // Horizontal swipe (optional extra)
+          if (
+            deltaX < -this.touchThreshold &&
+            Math.abs(deltaX) > Math.abs(deltaY)
+          ) {
+            if (this.keys.indexOf("swipe left") === -1)
               this.keys.push("swipe left");
-            } else if (
-              deltaX > this.touchThreshold &&
-              this.keys.indexOf("swipe right") === -1
-            ) {
+          } else if (
+            deltaX > this.touchThreshold &&
+            Math.abs(deltaX) > Math.abs(deltaY)
+          ) {
+            if (this.keys.indexOf("swipe right") === -1)
               this.keys.push("swipe right");
-            }
           }
         },
         { passive: false },
@@ -220,7 +224,7 @@ window.addEventListener("load", function () {
         this.frameTimer += deltaTime;
       }
 
-      // Controls (keyboard + touch)
+      // Horizontal movement (keyboard + touch)
       if (
         input.keys.indexOf("ArrowRight") > -1 ||
         input.keys.indexOf("swipe right") > -1 ||
@@ -233,14 +237,17 @@ window.addEventListener("load", function () {
         input.keys.indexOf("touch left") > -1
       ) {
         this.speed = -5;
-      } else if (
+      } else {
+        this.speed = 0;
+      }
+
+      // Jump (independent of left/right)
+      if (
         (input.keys.indexOf("ArrowUp") > -1 ||
           input.keys.indexOf("swipe up") > -1) &&
         this.onground()
       ) {
         this.vy -= 32;
-      } else {
-        this.speed = 0;
       }
 
       // Horizontal Movement
